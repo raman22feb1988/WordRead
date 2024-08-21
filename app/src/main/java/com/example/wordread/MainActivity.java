@@ -117,20 +117,20 @@ public class MainActivity extends AppCompatActivity {
             Arrays.sort(c);
             String anagram = new String(c);
             String definition = entry.getValue();
-            StringBuilder front = new StringBuilder();
             StringBuilder back = new StringBuilder();
+            StringBuilder front = new StringBuilder();
             for(char letter = 'A'; letter <= 'Z'; letter++)
             {
                 if(dictionary.containsKey(word + letter))
                 {
-                    front.append(letter);
+                    back.append(letter);
                 }
                 if(dictionary.containsKey(letter + word))
                 {
-                    back.append(letter);
+                    front.append(letter);
                 }
             }
-            boolean q = db.insertWord(word, word.length(), anagram, definition, probability(word), new String(front), new String(back));
+            boolean q = db.insertWord(word, word.length(), anagram, definition, probability(word), new String(back), new String(front));
         }
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("AppData", 0);
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         EditText e2 = yourCustomView.findViewById(R.id.edittext2);
 
         AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
-                .setTitle("SELECT back, word, front, definition FROM words WHERE")
+                .setTitle("SELECT front, word, back, definition FROM words WHERE")
                 .setView(yourCustomView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     {
         anagrams = db.getSqlQuery(sqlQuery);
         words = anagrams.size();
-        String query = "SELECT word, definition, front, back FROM words WHERE " + sqlQuery;
+        String query = "SELECT word, definition, back, front FROM words WHERE " + sqlQuery;
         int exist = db.getExist(query);
 
         if(exist == 0) {

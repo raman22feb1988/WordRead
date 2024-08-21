@@ -23,7 +23,7 @@ public class sqliteDB extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // TODO Auto-generated method stub
         db.execSQL(
-                "create table words(word text, length integer, anagram text, definition text, probability real, front text, back text)"
+                "create table words(word text, length integer, anagram text, definition text, probability real, back text, front text)"
         );
         db.execSQL(
                 "create table scores(length text, counter integer)"
@@ -66,7 +66,7 @@ public class sqliteDB extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean insertWord(String word, int length, String anagram, String definition, double probability, String front, String back)
+    public boolean insertWord(String word, int length, String anagram, String definition, double probability, String back, String front)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -76,8 +76,8 @@ public class sqliteDB extends SQLiteOpenHelper {
         contentValues.put("anagram", anagram);
         contentValues.put("definition", definition);
         contentValues.put("probability", probability);
-        contentValues.put("front", front);
         contentValues.put("back", back);
+        contentValues.put("front", front);
 
         db.insert("words", null, contentValues);
 
@@ -121,16 +121,16 @@ public class sqliteDB extends SQLiteOpenHelper {
         ArrayList<String> anagramList = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT word, definition, front, back FROM words WHERE length = " + letters + " ORDER BY probability DESC", null);
+        Cursor cursor = db.rawQuery("SELECT word, definition, back, front FROM words WHERE length = " + letters + " ORDER BY probability DESC", null);
 
         if (cursor.moveToFirst()) {
             do {
                 String data = cursor.getString(0);
                 String meaning = cursor.getString(1);
-                String front = cursor.getString(2);
-                String back = cursor.getString(3);
+                String back = cursor.getString(2);
+                String front = cursor.getString(3);
 
-                anagramList.add("<b><small>" + back + "</small> " + data + " <small>" + front + "</small></b> " + meaning);
+                anagramList.add("<b><small>" + front + "</small> " + data + " <small>" + back + "</small></b> " + meaning);
             } while (cursor.moveToNext());
         }
 
@@ -143,16 +143,16 @@ public class sqliteDB extends SQLiteOpenHelper {
 
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery("SELECT word, definition, front, back FROM words WHERE " + sqlQuery, null);
+            Cursor cursor = db.rawQuery("SELECT word, definition, back, front FROM words WHERE " + sqlQuery, null);
 
             if (cursor.moveToFirst()) {
                 do {
                     String data = cursor.getString(0);
                     String meaning = cursor.getString(1);
-                    String front = cursor.getString(2);
-                    String back = cursor.getString(3);
+                    String back = cursor.getString(2);
+                    String front = cursor.getString(3);
 
-                    anagramList.add("<b><small>" + back + "</small> " + data + " <small>" + front + "</small></b> " + meaning);
+                    anagramList.add("<b><small>" + front + "</small> " + data + " <small>" + back + "</small></b> " + meaning);
                 } while (cursor.moveToNext());
             }
         }
