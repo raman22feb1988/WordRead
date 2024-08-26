@@ -3,13 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <EditText
-        android:id="@+id/edittext2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </EditText>
     <TextView
-        android:id="@+id/textview3"
+        android:id="@+id/textview4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </TextView>

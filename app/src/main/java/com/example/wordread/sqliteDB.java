@@ -1,13 +1,19 @@
 package com.example.wordread;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class sqliteDB extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "CSW2021.db";
@@ -36,6 +42,42 @@ public class sqliteDB extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS words");
         db.execSQL("DROP TABLE IF EXISTS scores");
         onCreate(db);
+    }
+
+    public ArrayList<String> getTableNames()
+    {
+        ArrayList<String> tableList = new ArrayList<>();
+        int idx = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'table'", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String data = cursor.getString(0);
+
+                if(idx > 0) {
+                    tableList.add(data);
+                }
+                idx++;
+            } while(cursor.moveToNext());
+        }
+        return tableList;
+    }
+
+    public String getSchema()
+    {
+        String schema = new String();
+        ArrayList<String> tablesList = getTableNames();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        for(String tableName : tablesList)
+        {
+            Cursor cursor = db.query(tableName, null, null, null, null, null, null);
+            String columnList[] = cursor.getColumnNames();
+            schema += (schema.length() == 0 ? tableName + "\n" + Arrays.toString(columnList) : "\n" + tableName + "\n" + Arrays.toString(columnList));
+        }
+        return schema;
     }
 
     public boolean prepareScores()
@@ -137,11 +179,11 @@ public class sqliteDB extends SQLiteOpenHelper {
         return anagramList;
     }
 
-    public ArrayList<String> getSqlQuery(String sqlQuery)
+    public ArrayList<String> getSqlQuery(String sqlQuery, Context activity)
     {
-        ArrayList<String> anagramList = new ArrayList<>();
-
         try {
+            ArrayList<String> anagramList = new ArrayList<>();
+
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery("SELECT word, definition, back, front FROM words WHERE " + sqlQuery, null);
 
@@ -155,13 +197,14 @@ public class sqliteDB extends SQLiteOpenHelper {
                     anagramList.add("<b><small>" + front + "</small> " + data + " <small>" + back + "</small></b> " + meaning);
                 } while (cursor.moveToNext());
             }
+
+            return anagramList;
         }
         catch(SQLiteException e)
         {
-            anagramList.add(e.toString());
+            alertBox("Error", e.toString(), activity);
+            return null;
         }
-
-        return anagramList;
     }
 
     public int updateScores(String letters, int counter) {
@@ -176,5 +219,23 @@ public class sqliteDB extends SQLiteOpenHelper {
 
     public static void main(String[] args) {
         // TODO Auto-generated method stub
+    }
+
+    public void alertBox(String title, String message, Context location)
+    {
+        LayoutInflater inflater = LayoutInflater.from(location);
+        final View yourCustomView = inflater.inflate(R.layout.display, null);
+
+        TextView t1 = yourCustomView.findViewById(R.id.textview4);
+        t1.setText(message);
+
+        AlertDialog dialog = new AlertDialog.Builder(location)
+            .setTitle(title)
+            .setView(yourCustomView)
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                }
+            }).create();
+        dialog.show();
     }
 }

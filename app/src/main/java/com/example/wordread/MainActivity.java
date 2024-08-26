@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     Button b2;
     Button b3;
     Button b4;
+    Button b5;
 
     ArrayList<String> anagrams;
     int words;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         b2 = findViewById(R.id.button2);
         b3 = findViewById(R.id.button3);
         b4 = findViewById(R.id.button4);
+        b5 = findViewById(R.id.button5);
 
         db = new sqliteDB(MainActivity.this);
 
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         if(prepared) {
             getWordLength();
         } else {
-            Toast.makeText(MainActivity.this, "Please give some time to prepare database of dictionary words only when opening this for the first time", Toast.LENGTH_LONG).show();
+            db.alertBox("Database initialization", "Please give 1 hour to prepare database of dictionary words. Only when opening this for the first time.", MainActivity.this);
             db.prepareScores();
             prepareDictionary();
         }
@@ -147,13 +149,15 @@ public class MainActivity extends AppCompatActivity {
         final View yourCustomView = inflater.inflate(R.layout.input, null);
 
         EditText e1 = yourCustomView.findViewById(R.id.edittext1);
+        e1.setHint("Enter a value between 2 and 15");
 
         AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Word length")
                 .setView(yourCustomView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        letters = Integer.parseInt((e1.getText()).toString());
+                        String alphabet = (e1.getText()).toString();
+                        letters = alphabet.length() == 0 ? 0 : Integer.parseInt(alphabet);
                         if(letters < 2 || letters > 15)
                         {
                             Toast.makeText(MainActivity.this, "Enter a value between 2 and 15", Toast.LENGTH_LONG).show();
@@ -174,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
         final View yourCustomView = inflater.inflate(R.layout.sql_query, null);
 
         EditText e2 = yourCustomView.findViewById(R.id.edittext2);
+
+        TextView t3 = yourCustomView.findViewById(R.id.textview3);
+        t3.setText(db.getSchema());
 
         AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
                 .setTitle("SELECT front, word, back, definition FROM words WHERE")
@@ -198,20 +205,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void execute()
     {
-        anagrams = db.getSqlQuery(sqlQuery);
-        words = anagrams.size();
-        String query = "SELECT word, definition, back, front FROM words WHERE " + sqlQuery;
-        int exist = db.getExist(query);
+        ArrayList<String> resultSet = db.getSqlQuery(sqlQuery, MainActivity.this);
 
-        if(exist == 0) {
-            counter = 0;
-            db.insertScores(query, counter);
-        }
-        else {
-            counter = db.getCounter(query);
-        }
+        if(resultSet != null) {
+            anagrams = resultSet;
+            words = anagrams.size();
+            String query = "SELECT word, definition, back, front FROM words WHERE " + sqlQuery;
+            int exist = db.getExist(query);
 
-        executeSqlQuery(query);
+            if (exist == 0) {
+                counter = 0;
+                db.insertScores(query, counter);
+            } else {
+                counter = db.getCounter(query);
+            }
+
+            executeSqlQuery(query);
+        }
     }
 
     public void nextWord()
@@ -219,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
         b1.setEnabled(true);
         b2.setEnabled(true);
         b3.setEnabled(true);
+        b5.setEnabled(true);
 
         t1.setText("Page " + (counter + 1) + " out of " + (((words - 1) / 100) + 1));
         t2.setText("");
@@ -282,6 +293,39 @@ public class MainActivity extends AppCompatActivity {
                 getSqlQuery();
             }
         });
+
+        b5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                final View yourCustomView = inflater.inflate(R.layout.input, null);
+
+                EditText e3 = yourCustomView.findViewById(R.id.edittext1);
+                int maximum = ((words - 1) / 100) + 1;
+                e3.setHint("Enter a value between 1 and " + maximum);
+
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Go to page")
+                    .setView(yourCustomView)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String pages = (e3.getText()).toString();
+                            int page = pages.length() == 0 ? 0 : Integer.parseInt(pages);
+                            if(page < 1 || page > maximum)
+                            {
+                                Toast.makeText(MainActivity.this, "Enter a value between 1 and " + maximum, Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                counter = page - 1;
+                                db.updateScores(Integer.toString(letters), counter);
+                                nextWord();
+                            }
+                        }
+                    }).create();
+                dialog.show();
+            }
+        });
     }
 
     public void executeSqlQuery(String query)
@@ -303,21 +347,11 @@ public class MainActivity extends AppCompatActivity {
             String jumble = anagrams.get(position);
             if(i == 0)
             {
-                if(jumble.contains("SQLiteException")) {
-                    t2.setText(jumble);
-                }
-                else {
-                    t2.setText((position + 1) + ". " + jumble);
-                }
+                t2.setText((position + 1) + ". " + jumble);
             }
             else
             {
-                if(jumble.contains("SQLiteException")) {
-                    t2.setText(t2.getText() + "<br>" + jumble);
-                }
-                else {
-                    t2.setText(t2.getText() + "<br>" + (position + 1) + ". " + jumble);
-                }
+                t2.setText(t2.getText() + "<br>" + (position + 1) + ". " + jumble);
             }
         }
 
@@ -362,11 +396,44 @@ public class MainActivity extends AppCompatActivity {
                 getSqlQuery();
             }
         });
+
+        b5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                final View yourCustomView = inflater.inflate(R.layout.input, null);
+
+                EditText e4 = yourCustomView.findViewById(R.id.edittext1);
+                int maximum = ((words - 1) / 100) + 1;
+                e4.setHint("Enter a value between 1 and " + maximum);
+
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Go to page")
+                        .setView(yourCustomView)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String pages = (e4.getText()).toString();
+                                int page = pages.length() == 0 ? 0 : Integer.parseInt(pages);
+                                if(page < 1 || page > maximum)
+                                {
+                                    Toast.makeText(MainActivity.this, "Enter a value between 1 and " + maximum, Toast.LENGTH_LONG).show();
+                                }
+                                else
+                                {
+                                    counter = page - 1;
+                                    db.updateScores(query, counter);
+                                    nextWord();
+                                }
+                            }
+                        }).create();
+                dialog.show();
+            }
+        });
     }
 
     public double probability(String st)
     {
-        int frequency[] = new int[]{9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
+        int frequency[] = new int[] {9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
         int count = 100;
         double chance = 1;
         for(int j = 0; j < st.length(); j++)
