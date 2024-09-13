@@ -325,7 +325,6 @@ public class MainActivity extends AppCompatActivity {
     {
         b1.setEnabled(true);
         b2.setEnabled(true);
-        b3.setEnabled(true);
         b5.setEnabled(true);
 
         t1.setText("Page " + (counter + 1) + " out of " + (((words - 1) / 100) + 1));
