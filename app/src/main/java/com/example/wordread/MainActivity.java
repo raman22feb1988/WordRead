@@ -75,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
                 getWordLength();
             }
         });
+
+        b4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSqlQuery();
+            }
+        });
     }
 
     public void prepareDictionary()
@@ -280,20 +287,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        b3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getWordLength();
-            }
-        });
-
-        b4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getSqlQuery();
-            }
-        });
-
         b5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -305,24 +298,24 @@ public class MainActivity extends AppCompatActivity {
                 e3.setHint("Enter a value between 1 and " + maximum);
 
                 AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("Go to page")
-                    .setView(yourCustomView)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String pages = (e3.getText()).toString();
-                            int page = pages.length() == 0 ? 0 : Integer.parseInt(pages);
-                            if(page < 1 || page > maximum)
-                            {
-                                Toast.makeText(MainActivity.this, "Enter a value between 1 and " + maximum, Toast.LENGTH_LONG).show();
+                        .setTitle("Go to page")
+                        .setView(yourCustomView)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String pages = (e3.getText()).toString();
+                                int page = pages.length() == 0 ? 0 : Integer.parseInt(pages);
+                                if(page < 1 || page > maximum)
+                                {
+                                    Toast.makeText(MainActivity.this, "Enter a value between 1 and " + maximum, Toast.LENGTH_LONG).show();
+                                }
+                                else
+                                {
+                                    counter = page - 1;
+                                    db.updateScores(Integer.toString(letters), counter);
+                                    nextWord();
+                                }
                             }
-                            else
-                            {
-                                counter = page - 1;
-                                db.updateScores(Integer.toString(letters), counter);
-                                nextWord();
-                            }
-                        }
-                    }).create();
+                        }).create();
                 dialog.show();
             }
         });
@@ -380,20 +373,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 db.updateScores(query, counter);
                 executeSqlQuery(query);
-            }
-        });
-
-        b3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getWordLength();
-            }
-        });
-
-        b4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getSqlQuery();
             }
         });
 
