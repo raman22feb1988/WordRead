@@ -35,9 +35,8 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Go To Page"
-                android:enabled="false"
-                android:id="@+id/button5">
+                android:text="Custom Query"
+                android:id="@+id/button4">
             </Button>
         </LinearLayout>
         <LinearLayout
@@ -53,8 +52,9 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Custom Query"
-                android:id="@+id/button4">
+                android:text="Go To Page"
+                android:enabled="false"
+                android:id="@+id/button5">
             </Button>
         </LinearLayout>
         <ScrollView
