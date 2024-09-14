@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
     public void getSqlQuery()
     {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-        final View yourCustomView = inflater.inflate(R.layout.sql_query, null);
+        final View yourCustomView = inflater.inflate(R.layout.query, null);
 
         EditText e2 = yourCustomView.findViewById(R.id.edittext2);
 
