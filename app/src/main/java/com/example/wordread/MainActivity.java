@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     Button b3;
     Button b4;
     Button b5;
+    Button b6;
+    Button b7;
+    Button b8;
 
     ArrayList<String> anagrams;
     int words;
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         b3 = findViewById(R.id.button3);
         b4 = findViewById(R.id.button4);
         b5 = findViewById(R.id.button5);
+        b6 = findViewById(R.id.button6);
+        b7 = findViewById(R.id.button7);
+        b8 = findViewById(R.id.button8);
 
         db = new sqliteDB(MainActivity.this);
 
@@ -80,6 +86,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 getSqlQuery();
+            }
+        });
+
+        b6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                db.exportDB(MainActivity.this);
+            }
+        });
+
+        b7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                db.importDB(MainActivity.this);
+            }
+        });
+
+        b8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                db.importLabels(MainActivity.this);
             }
         });
     }
